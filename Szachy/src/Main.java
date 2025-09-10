@@ -1,4 +1,5 @@
 import javax.swing.JFrame;
+import java.awt.*;
 
 public class Main {
     public static void main(String[] args) {
@@ -6,7 +7,9 @@ public class Main {
         window.setResizable(false);
         window.setSize(1280, 720);
         window.setLocationRelativeTo(null);
+        window.add(new Board(), BorderLayout.EAST);
 
         window.setVisible(true);
+
     }
 }
