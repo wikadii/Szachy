@@ -8,9 +8,15 @@ public class King extends Piece{
             image = setImage("images/black-king.png");
         }
     }
-    public Boolean validateMove(int destCol, int destRow){
+    public Boolean validateMove(int destCol, int destRow, ChessBoard board){
         if (Math.abs(destCol - this.col) + Math.abs(destRow - this.row) == 1 ||  Math.abs(destCol - this.col) * Math.abs(destRow - this.row) == 1){
-            return true;
+            target = board.getPieceAt(destCol, destRow);
+            if (target != null){
+                return !(target.color == color);
+            }
+            else{
+                return true;
+            }
         }
         return false;
     }

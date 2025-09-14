@@ -8,6 +8,11 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 
+/*
+    ischeck mozna zrobic tak
+    col , row krola jednego i drugiego - petla przez pieces - jezeli validate(colKrola, rowKrola) == true return ze jest szach
+    i ewentualnie cofnij ruch, mata to sie jeszcze wymysli xd
+    */
 
 public class ChessBoard extends JPanel {
     public int width = 480;
@@ -145,7 +150,7 @@ public class ChessBoard extends JPanel {
                     g2D.setColor(Color.decode("#769656"));
                     isBlack = false;
                 }
-                g2D.fillRect(col * 60, row * 60, 60, 60);
+                g2D.fillRect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
             }
             isBlack = !isBlack;
         }

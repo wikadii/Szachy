@@ -1,3 +1,5 @@
+import java.awt.*;
+
 public class Pawn extends Piece{
     Boolean isFirstMove;
 

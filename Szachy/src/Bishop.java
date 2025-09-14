@@ -12,7 +12,13 @@ public class Bishop extends Piece{
     @Override
     public Boolean validateMove(int destCol, int destRow, ChessBoard board) {
         if (Math.abs(destCol - this.col) == Math.abs(destRow - this.row)) {
-            return true;
+            target = board.getPieceAt(destCol, destRow);
+            if (target != null){
+                return !(target.color == color);
+            }
+            else{
+                return true;
+            }
         }
         return false;
     }
