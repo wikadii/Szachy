@@ -12,9 +12,12 @@ import java.util.ArrayList;
 public class ChessBoard extends JPanel {
     public int width = 480;
     public int height = 480;
+    public final int WHITE = 1;
+    public final int BLACK = 0;
+    public final int TILE_SIZE = 60;
+    int turn = WHITE;
     public BufferedImage image;
     public JLabel label;
-    public final int TILE_SIZE = 60;
     Piece selectedPiece = null;
 
 
@@ -30,7 +33,7 @@ public class ChessBoard extends JPanel {
                 int row = 8 - (e.getY() / TILE_SIZE);
 
                 for (Piece p : pieces) {
-                    if (p.col == col && p.row == row) {
+                    if (p.col == col && p.row == row && turn == p.color) {
                         selectedPiece = p;
                         System.out.println(selectedPiece);
                         break;
@@ -45,8 +48,17 @@ public class ChessBoard extends JPanel {
                     int row = 8 - (e.getY() / TILE_SIZE);
                     int pieceRow = selectedPiece.row;
                     int pieceCol = selectedPiece.col;
-                    if (selectedPiece.validateMove(col, row)) {
+                    if (selectedPiece.validateMove(col, row, ChessBoard.this)) {
                         selectedPiece.updatePieceLocation(col, row);
+                        if (selectedPiece.target != null) {
+                            pieces.remove(selectedPiece.target);
+                        }
+                        if (turn == WHITE){
+                            turn = BLACK;
+                        }
+                        else{
+                            turn = WHITE;
+                        }
                     } else {
                         selectedPiece.updatePieceLocation(pieceCol, pieceRow);
                         System.out.println("Invalid move");
@@ -139,5 +151,16 @@ public class ChessBoard extends JPanel {
         }
     }
 
+    public Boolean isEmpty(int col, int row){
+        return getPieceAt(col, row) == null;
+    }
 
+    Piece getPieceAt(int col, int row){
+        for (Piece p: pieces){
+            if (p.col == col && p.row == row) {
+                return p;
+            }
+        }
+        return null;
+    }
 }

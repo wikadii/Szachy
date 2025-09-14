@@ -12,6 +12,7 @@ public class Piece {
     private final int TILE_SIZE = 60;
     public final int BLACK = 0;
     public final int WHITE = 1;
+    Piece target;
     BufferedImage image;
 
     public BufferedImage setImage(String filename) {
@@ -34,7 +35,7 @@ public class Piece {
         updatePieceLocation(col, row);
     }
 
-    public Boolean validateMove(int destCol, int destRow) {
+    public Boolean validateMove(int destCol, int destRow, ChessBoard board) {
         return false;
     }
 }

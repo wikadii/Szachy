@@ -10,7 +10,7 @@ public class Knight extends Piece{
     }
 
     @Override
-    public Boolean validateMove(int destCol, int destRow) {
+    public Boolean validateMove(int destCol, int destRow, ChessBoard board) {
         if(Math.abs(destCol - this.col) * Math.abs(destRow - this.row) == 2){
             return true;
         }

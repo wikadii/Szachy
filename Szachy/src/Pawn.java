@@ -12,16 +12,16 @@ public class Pawn extends Piece{
         isFirstMove = true;
     }
 
-    public Boolean validateMove(int destCol, int destRow) {
+    public Boolean validateMove(int destCol, int destRow, ChessBoard board) {
         if (isFirstMove) {
             if (this.color == BLACK){
-                if (this.row - destRow == 2 && this.col - destCol == 0|| this.row - destRow == 1 && this.col - destCol == 0){
+                if (this.row - destRow == 2 && this.col - destCol == 0|| this.row - destRow == 1 && this.col - destCol == 0 && board.isEmpty(destCol, destRow)){
                     isFirstMove = false;
                     return true;
                 }
             }
             else{
-                if (destRow - this.row == 2 && this.col - destCol == 0 || destRow - this.row == 1 && this.col - destCol == 0){
+                if (destRow - this.row == 2 && this.col - destCol == 0 || destRow - this.row == 1 && this.col - destCol == 0 && board.isEmpty(destCol, destRow)){
                     isFirstMove = false;
                     return true;
                 }
@@ -29,17 +29,22 @@ public class Pawn extends Piece{
         }
         else{
             if (this.color == BLACK){
-                if (this.row - destRow == 1){
+                if (this.row - destRow == 1 && this.col - destCol == 0 && board.isEmpty(destCol, destRow)){
                     isFirstMove = false;
                     return true;
                 }
             }
             else{
-                if (destRow - this.row == 1){
+                if (destRow - this.row == 1 && this.col - destCol == 0 && board.isEmpty(destCol, destRow)){
                     isFirstMove = false;
                     return true;
                 }
             }
+        }
+
+        if (Math.abs(destRow - this.row) * Math.abs(destCol - this.col) == 1){
+            target = board.getPieceAt(destCol, destRow);
+            return target != null;
         }
         return false;
     }
