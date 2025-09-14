@@ -3,6 +3,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,32 +17,53 @@ public class ChessBoard extends JPanel {
     public final int TILE_SIZE = 60;
     Piece selectedPiece = null;
 
+
+
+
     ArrayList<Piece> pieces = new ArrayList<Piece>();
 
     void move(){
         this.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-                int col = (e.getX() / TILE_SIZE) + 1;   // kolumny od 1 do 8
-                int row = 8 - (e.getY() / TILE_SIZE);   // wiersze od 1 do 8 (od dołu)
-                if (selectedPiece == null){
-                    for (Piece p : pieces) {
-                        if (p.col == col && p.row == row) {
-                            System.out.println(p + " essa");
-                            selectedPiece = p;
-                            break;
-                        }
+            @Override
+            public void mousePressed(MouseEvent e) {
+                int col = (e.getX() / TILE_SIZE) + 1;
+                int row = 8 - (e.getY() / TILE_SIZE);
+
+                for (Piece p : pieces) {
+                    if (p.col == col && p.row == row) {
+                        selectedPiece = p;
+                        System.out.println(selectedPiece);
+                        break;
                     }
                 }
-                else{
-                    if (selectedPiece.validateMove(col,row)){
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (selectedPiece != null) {
+                    int col = (e.getX() / TILE_SIZE) + 1;
+                    int row = 8 - (e.getY() / TILE_SIZE);
+                    int pieceRow = selectedPiece.row;
+                    int pieceCol = selectedPiece.col;
+                    if (selectedPiece.validateMove(col, row)) {
                         selectedPiece.updatePieceLocation(col, row);
-                        repaint();
-                        selectedPiece = null;
+                    } else {
+                        selectedPiece.updatePieceLocation(pieceCol, pieceRow);
+                        System.out.println("Invalid move");
                     }
-                    else{
-                        System.out.println("Error");
-                        selectedPiece = null;
-                    }
+                    selectedPiece = null;
+                    repaint();
+                }
+            }
+        });
+
+        this.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (selectedPiece != null) {
+                    selectedPiece.x = e.getX() - TILE_SIZE / 2;
+                    selectedPiece.y = e.getY() - TILE_SIZE / 2;
+                    repaint();
                 }
             }
         });
