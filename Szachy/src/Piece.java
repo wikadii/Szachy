@@ -2,12 +2,16 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
+
 public class Piece {
     public int x;
     public int y;
     public int row;
     public int col;
     public int color;
+    private final int TILE_SIZE = 60;
+    public final int BLACK = 0;
+    public final int WHITE = 1;
     BufferedImage image;
 
     public BufferedImage setImage(String filename) {
@@ -19,11 +23,18 @@ public class Piece {
         return image;
     }
 
-    public Piece(int color ,int x, int y) {
+    public void updatePieceLocation(int col, int row) {
+        this.col = col;
+        this.row = row;
+        this.x = (col - 1) * TILE_SIZE;
+        this.y = (8 - row) * TILE_SIZE;
+    }
+    public Piece(int color ,int col, int row) {
         this.color = color;
-        this.x = (x - 1) * 60;
-        this.y = (8 - y) * 60;
-        this.col = x;
-        this.row = y;
+        updatePieceLocation(col, row);
+    }
+
+    public Boolean validateMove(int destCol, int destRow) {
+        return false;
     }
 }

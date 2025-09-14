@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 
+
 public class ChessBoard extends JPanel {
     public int width = 480;
     public int height = 480;
@@ -22,33 +23,25 @@ public class ChessBoard extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 int col = (e.getX() / TILE_SIZE) + 1;   // kolumny od 1 do 8
                 int row = 8 - (e.getY() / TILE_SIZE);   // wiersze od 1 do 8 (od dołu)
-                for(Piece p : pieces){
-                    if (p.col == col && p.row == row){
-                        System.out.println(p + " essa");
-                        selectedPiece = p;
-                        break;
+                if (selectedPiece == null){
+                    for (Piece p : pieces) {
+                        if (p.col == col && p.row == row) {
+                            System.out.println(p + " essa");
+                            selectedPiece = p;
+                            break;
+                        }
                     }
                 }
-            }
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                if (selectedPiece != null) {
-                    selectedPiece.x = e.getX() - TILE_SIZE/2;
-                    selectedPiece.y = e.getY() - TILE_SIZE/2;
-                    repaint();
-                }
-            }
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (selectedPiece != null) {
-                    // Aktualizacja kolumny/wiersza po upuszczeniu
-                    selectedPiece.col = (e.getX() / TILE_SIZE) + 1;
-                    selectedPiece.row = 8 - (e.getY() / TILE_SIZE);
-                    // Przelicz piksele do rysowania
-                    selectedPiece.x = (selectedPiece.col - 1) * TILE_SIZE;
-                    selectedPiece.y = (8 - selectedPiece.row) * TILE_SIZE;
-                    selectedPiece = null;
-                    repaint();
+                else{
+                    if (selectedPiece.validateMove(col,row)){
+                        selectedPiece.updatePieceLocation(col, row);
+                        repaint();
+                        selectedPiece = null;
+                    }
+                    else{
+                        System.out.println("Error");
+                        selectedPiece = null;
+                    }
                 }
             }
         });
@@ -58,7 +51,7 @@ public class ChessBoard extends JPanel {
         this.setPreferredSize(new Dimension(width, height));
         this.setBackground(Color.decode("#80807e"));
         try {
-            image = ImageIO.read(getClass().getResourceAsStream("pawn.png"));
+            image = ImageIO.read(getClass().getResourceAsStream("images/pawn.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -123,4 +116,6 @@ public class ChessBoard extends JPanel {
             isBlack = !isBlack;
         }
     }
+
+
 }

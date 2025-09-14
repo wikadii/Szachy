@@ -1,7 +1,7 @@
 import javax.swing.*;
 
 public class Window extends JFrame {
-    ChessBoard board = new ChessBoard();
+    public ChessBoard board = new ChessBoard();
     public Window(){
         this.setTitle("Szachy");
         this.setSize(1000, 600);

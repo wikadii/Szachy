@@ -1,14 +1,19 @@
-import javax.imageio.ImageIO;
-import java.io.IOException;
-
 public class Rook extends Piece{
     public Rook(int color ,int x, int y) {
         super(color, x, y);
         if (color == 1){
-            image = setImage("white-rook.png");
+            image = setImage("images/white-rook.png");
         }
         else {
-            image = setImage("black-rook.png");
+            image = setImage("images/black-rook.png");
         }
+    }
+
+    @Override
+    public Boolean validateMove(int destCol, int destRow) {
+        if (Math.abs(destCol - this.col) < 8 && Math.abs(destRow - this.row) == 0 || Math.abs(destCol - this.col) == 0 && Math.abs(destRow - this.row) < 8) {
+            return true;
+        }
+        return false;
     }
 }
