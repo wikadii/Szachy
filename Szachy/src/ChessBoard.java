@@ -149,7 +149,7 @@ public class ChessBoard extends JPanel {
                     selectedPiece.y = e.getY() - TILE_SIZE / 2;
                     repaint();
                 }
-            }
+             }
         });
     }
 }

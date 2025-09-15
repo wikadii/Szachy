@@ -18,6 +18,7 @@ public class Rook extends Piece{
                     return false;
                 }
             }
+            canCastle = false;
             return verifyTarget(board, destinationCol, destinationRow);
         }
 
@@ -29,6 +30,7 @@ public class Rook extends Piece{
                     return false; // path blocked
                 }
             }
+            canCastle = false;
             return verifyTarget(board, destinationCol, destinationRow);
         }
 

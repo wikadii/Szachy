@@ -53,9 +53,5 @@ public class Piece {
             return true;
         }
     }
-    public boolean canCastle(int color, boolean canCastle){
-        if(canCastle){
 
-        }
-    }
 }
