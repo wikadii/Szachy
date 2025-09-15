@@ -1,6 +1,6 @@
 public class Rook extends Piece{
-    public Rook(int color ,int x, int y) {
-        super(color, x, y);
+    public Rook(int color ,int x, int y, ChessBoard board) {
+        super(color, x, y, board);
         if (color == 1){
             image = getImage("images/white-rook.png");
         } else {
@@ -10,15 +10,29 @@ public class Rook extends Piece{
 
     @Override
     public Boolean validateMove(int destinationCol, int destinationRow, ChessBoard board) {
-        if (Math.abs(destinationCol - this.col) < 8 && Math.abs(destinationRow - this.row) == 0 || Math.abs(destinationCol - this.col) == 0 && Math.abs(destinationRow - this.row) < 8) {
-            target = board.getPieceAt(destinationCol, destinationRow);
-            if (target != null){
-                return !(target.color == color);
+        // Moving horizontally
+        if (destinationRow == this.row && destinationCol != this.col) {
+            int step = (destinationCol > this.col) ? 1 : -1;
+            for (int c = this.col + step; c != destinationCol; c += step) {
+                if (board.getPieceAt(c, this.row) != null) {
+                    return false;
+                }
             }
-            else{
-                return true;
-            }
+            return verifyTarget(board, destinationCol, destinationRow);
         }
+
+        // Moving vertically
+        if (destinationCol == this.col && destinationRow != this.row) {
+            int step = (destinationRow > this.row) ? 1 : -1;
+            for (int r = this.row + step; r != destinationRow; r += step) {
+                if (board.getPieceAt(this.col, r) != null) {
+                    return false; // path blocked
+                }
+            }
+            return verifyTarget(board, destinationCol, destinationRow);
+        }
+
         return false;
     }
+
 }

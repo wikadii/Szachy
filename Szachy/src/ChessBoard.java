@@ -3,7 +3,6 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 /*
@@ -22,7 +21,10 @@ public class ChessBoard extends JPanel {
     public final int ROW_NUM = 8;
 
     private int turn = WHITE;
-    public BufferedImage image;
+
+    public boolean isWhiteInCheck = false;
+    public boolean isBLackInCheck = false;
+
     Piece selectedPiece = null;
     ArrayList<Piece> pieces = new ArrayList<Piece>();
 
@@ -40,29 +42,29 @@ public class ChessBoard extends JPanel {
     public void setPieces(ArrayList<Piece> pieces){
         //biale
         for(int i = 1; i <= 8; i++){
-            pieces.add(new Pawn(1,i,2));
+            pieces.add(new Pawn(1,i,2, this));
         }
-        pieces.add(new Rook(1,1,1));
-        pieces.add(new Rook(1,8,1));
-        pieces.add(new Knight(1,2,1));
-        pieces.add(new Knight(1,7,1));
-        pieces.add(new Bishop(1,3,1));
-        pieces.add(new Bishop(1,6,1));
-        pieces.add(new King(1,5,1));
-        pieces.add(new Queen(1,4,1));
+        pieces.add(new Rook(1,1,1, this));
+        pieces.add(new Rook(1,8,1, this));
+        pieces.add(new Knight(1,2,1, this));
+        pieces.add(new Knight(1,7,1, this));
+        pieces.add(new Bishop(1,3,1, this));
+        pieces.add(new Bishop(1,6,1, this));
+        pieces.add(new King(1,5,1, this));
+        pieces.add(new Queen(1,4,1, this));
 
         //czarne
         for(int i = 1; i <= 8; i++){
-            pieces.add(new Pawn(0,i,7));
+            pieces.add(new Pawn(0,i,7, this));
         }
-        pieces.add(new Rook(0,1,8));
-        pieces.add(new Rook(0,8,8));
-        pieces.add(new Knight(0,2,8));
-        pieces.add(new Knight(0,7,8));
-        pieces.add(new Bishop(0,3,8));
-        pieces.add(new Bishop(0,6,8));
-        pieces.add(new King(0,5,8));
-        pieces.add(new Queen(0,4,8));
+        pieces.add(new Rook(0,1,8, this));
+        pieces.add(new Rook(0,8,8, this));
+        pieces.add(new Knight(0,2,8, this));
+        pieces.add(new Knight(0,7,8, this));
+        pieces.add(new Bishop(0,3,8, this));
+        pieces.add(new Bishop(0,6,8, this));
+        pieces.add(new King(0,5,8, this));
+        pieces.add(new Queen(0,4,8, this));
     }
     public void drawPiece(Graphics2D g2D) {
         for (Piece p: pieces){

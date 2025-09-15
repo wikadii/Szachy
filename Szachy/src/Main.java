@@ -3,3 +3,4 @@ public class Main{
         new Window();
     }
 }
+// kurwa naprawic bug z czarną dziurą
