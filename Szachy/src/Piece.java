@@ -1,41 +1,39 @@
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-
+import java.util.Objects;
 
 public class Piece {
-    public int x;
-    public int y;
-    public int row;
-    public int col;
-    public int color;
-    private final int TILE_SIZE = 60;
     public final int BLACK = 0;
     public final int WHITE = 1;
+
     Piece target;
     BufferedImage image;
 
-    public BufferedImage setImage(String filename) {
+    public int x, y;
+    public int row, col;
+    public int color;
+
+    public Piece(int color ,int col, int row) {
+        this.color = color;
+        updatePieceLocation(col, row);
+    }
+    public BufferedImage getImage(String filename) {
         try {
-            image = ImageIO.read(getClass().getResourceAsStream(filename));
+            image = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(filename)));
         } catch (IOException e) {
             e.printStackTrace();
         }
         return image;
     }
-
     public void updatePieceLocation(int col, int row) {
+        int tile_size = 60;
         this.col = col;
         this.row = row;
-        this.x = (col - 1) * TILE_SIZE;
-        this.y = (8 - row) * TILE_SIZE;
+        this.x = (col - 1) * tile_size;
+        this.y = (8 - row) * tile_size;
     }
-    public Piece(int color ,int col, int row) {
-        this.color = color;
-        updatePieceLocation(col, row);
-    }
-
-    public Boolean validateMove(int destCol, int destRow, ChessBoard board) {
+    public Boolean validateMove(int destinationCol, int destinationRow, ChessBoard board) {
         return false;
     }
 }
