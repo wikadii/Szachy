@@ -3,4 +3,3 @@ public class Main{
         new Window();
     }
 }
-// kurwa naprawic b ug z czarną dziurą

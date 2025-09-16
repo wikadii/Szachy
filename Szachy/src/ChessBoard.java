@@ -36,43 +36,47 @@ public class ChessBoard extends JPanel {
         setPieces(pieces);
         move();
     }
+
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         drawBoard((Graphics2D) g);
         drawPiece((Graphics2D) g);
     }
-    public void setPieces(ArrayList<Piece> pieces){
+
+    public void setPieces(ArrayList<Piece> pieces) {
         //biale
-        for(int i = 1; i <= 8; i++){
-            pieces.add(new Pawn(1,i,2, this));
+        for (int i = 1; i <= 8; i++) {
+            pieces.add(new Pawn(1, i, 2, this));
         }
-        pieces.add(new Rook(1,1,1, this));
-        pieces.add(new Rook(1,8,1, this));
-        pieces.add(new Knight(1,2,1, this));
-        pieces.add(new Knight(1,7,1, this));
-        pieces.add(new Bishop(1,3,1, this));
-        pieces.add(new Bishop(1,6,1, this));
-        pieces.add(new King(1,5,1, this));
-        pieces.add(new Queen(1,4,1, this));
+        pieces.add(new Rook(1, 1, 1, this));
+        pieces.add(new Rook(1, 8, 1, this));
+        pieces.add(new Knight(1, 2, 1, this));
+        pieces.add(new Knight(1, 7, 1, this));
+        pieces.add(new Bishop(1, 3, 1, this));
+        pieces.add(new Bishop(1, 6, 1, this));
+        pieces.add(new King(1, 5, 1, this));
+        pieces.add(new Queen(1, 4, 1, this));
 
         //czarne
-        for(int i = 1; i <= 8; i++){
-            pieces.add(new Pawn(0,i,7, this));
+        for (int i = 1; i <= 8; i++) {
+            pieces.add(new Pawn(0, i, 7, this));
         }
-        pieces.add(new Rook(0,1,8, this));
-        pieces.add(new Rook(0,8,8, this));
-        pieces.add(new Knight(0,2,8, this));
-        pieces.add(new Knight(0,7,8, this));
-        pieces.add(new Bishop(0,3,8, this));
-        pieces.add(new Bishop(0,6,8, this));
-        pieces.add(new King(0,5,8, this));
-        pieces.add(new Queen(0,4,8, this));
+        pieces.add(new Rook(0, 1, 8, this));
+        pieces.add(new Rook(0, 8, 8, this));
+        pieces.add(new Knight(0, 2, 8, this));
+        pieces.add(new Knight(0, 7, 8, this));
+        pieces.add(new Bishop(0, 3, 8, this));
+        pieces.add(new Bishop(0, 6, 8, this));
+        pieces.add(new King(0, 5, 8, this));
+        pieces.add(new Queen(0, 4, 8, this));
     }
+
     public void drawPiece(Graphics2D g2D) {
-        for (Piece p: pieces){
-            g2D.drawImage(p.image,p.x,p.y, TILE_SIZE, TILE_SIZE,this);
+        for (Piece p : pieces) {
+            g2D.drawImage(p.image, p.x, p.y, TILE_SIZE, TILE_SIZE, this);
         }
     }
+
     public void drawBoard(Graphics2D g2D) {
         boolean isBlack = false;
         for (int row = 0; row < ROW_NUM; row++) {
@@ -89,18 +93,54 @@ public class ChessBoard extends JPanel {
             isBlack = !isBlack;
         }
     }
-    public Boolean isEmpty(int col, int row){
+
+    public Boolean isEmpty(int col, int row) {
         return getPieceAt(col, row) == null;
     }
-    public Piece getPieceAt(int col, int row){
-        for (Piece p: pieces){
+
+    public Piece getPieceAt(int col, int row) {
+        for (Piece p : pieces) {
             if (p.col == col && p.row == row) {
                 return p;
             }
         }
         return null;
     }
-    public void move(){
+
+    public boolean simulateMove(int col, int row, Piece selectedPiece) {
+        int pieceCol = selectedPiece.col;
+        int pieceRow = selectedPiece.row;
+        selectedPiece.target = getPieceAt(col, row);
+        selectedPiece.updatePieceLocation(col, row);
+        if (selectedPiece.target != null) {
+            pieces.remove(selectedPiece.target);
+        }
+        if (turn == WHITE){
+            isWhiteInCheck = isWhiteKingAttacked();
+            if (isWhiteInCheck) {
+                selectedPiece.updatePieceLocation(pieceCol, pieceRow);
+                if (selectedPiece.target != null) {
+                    pieces.add(selectedPiece.target);
+                }
+                System.out.println("Invalid move");
+                return false;
+            }
+        }
+        else{
+            isBlackInCheck = isBlackKingAttacked();
+            if (isBlackInCheck) {
+                selectedPiece.updatePieceLocation(pieceCol, pieceRow);
+                if (selectedPiece.target != null) {
+                    pieces.add(selectedPiece.target);
+                }
+                System.out.println("Invalid move");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void move() {
         this.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -123,28 +163,17 @@ public class ChessBoard extends JPanel {
                     int row = 8 - (e.getY() / TILE_SIZE);
                     int pieceRow = selectedPiece.row;
                     int pieceCol = selectedPiece.col;
-                    if (selectedPiece.validateMove(col, row, ChessBoard.this)) {
-                        selectedPiece.target = getPieceAt(col, row);
-                        selectedPiece.updatePieceLocation(col, row);
+                    if (selectedPiece.validateMove(col, row, ChessBoard.this) && simulateMove(col, row, selectedPiece)) {
                         selectedPiece.isFirstMove = false;
-                        if (selectedPiece.target != null) {
-                            pieces.remove(selectedPiece.target);
-                        }
-                        isWhiteInCheck = isWhiteKingAttacked();
-                        isBlackInCheck = isBlackKingAttacked();
-                        if(isWhiteInCheck ||  isBlackInCheck){
-                            System.out.println("check");
-                        }
-                        if (turn == WHITE){
+                        if (turn == WHITE) {
                             turn = BLACK;
-                        }else{
+                        } else {
                             turn = WHITE;
                         }
                     } else {
                         selectedPiece.updatePieceLocation(pieceCol, pieceRow);
                         System.out.println("Invalid move");
                     }
-                    selectedPiece.moves.clear();
                     selectedPiece = null;
                     repaint();
                 }
@@ -159,21 +188,23 @@ public class ChessBoard extends JPanel {
                     selectedPiece.y = e.getY() - TILE_SIZE / 2;
                     repaint();
                 }
-             }
+            }
         });
     }
 
-    public boolean isWhiteKingAttacked(){
+    public boolean isWhiteKingAttacked() {
         Piece king = null;
-        for (Piece p: pieces){
-            if (p.isKing && p.color == 1){
+        for (Piece p : pieces) {
+            if (p.isKing && p.color == 1) {
                 king = p;
+                break;
             }
         }
-        for (Piece p: pieces){
-            if (p.color == 0 && !p.isKing){
+        if (king == null) return false;
+        for (Piece p : pieces) {
+            if (p.color == 0 && !p.isKing) {
                 p.getMoves();
-                for (int[] a : p.moves){
+                for (int[] a : p.moves) {
                     if (a[0] == king.col && a[1] == king.row) {
                         return true;
                     }
@@ -182,17 +213,20 @@ public class ChessBoard extends JPanel {
         }
         return false;
     }
-    public boolean isBlackKingAttacked(){
+
+    public boolean isBlackKingAttacked() {
         Piece king = null;
-        for (Piece p: pieces){
-            if (p.isKing && p.color == 0){
+        for (Piece p : pieces) {
+            if (p.isKing && p.color == 0) {
                 king = p;
+                break;
             }
         }
-        for (Piece p: pieces){
-            if (p.color == 1 && !p.isKing){
+        if (king == null) return false;
+        for (Piece p : pieces) {
+            if (p.color == 1 && !p.isKing) {
                 p.getMoves();
-                for (int[] a : p.moves){
+                for (int[] a : p.moves) {
                     if (a[0] == king.col && a[1] == king.row) {
                         return true;
                     }

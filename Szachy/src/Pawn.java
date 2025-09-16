@@ -1,9 +1,10 @@
-public class Pawn extends Piece {
-    public Pawn(int color, int x, int y, ChessBoard board) {
+public class Pawn extends Piece{
+    public Pawn(int color ,int x, int y, ChessBoard board) {
         super(color, x, y, board);
-        if (color == 1) {
+        if (color == 1){
             image = getImage("images/whitePawn.png");
-        } else {
+        }
+        else {
             image = getImage("images/pawn.png");
         }
         isFirstMove = true;
@@ -11,15 +12,12 @@ public class Pawn extends Piece {
 
     public Boolean validateMove(int destinationCol, int destinationRow, ChessBoard board) {
         int direction = (color == WHITE) ? 1 : -1;
-
-        // --- Standard one-square move
         if (destinationCol == this.col &&
                 destinationRow == this.row + direction &&
                 board.isEmpty(destinationCol, destinationRow)) {
             return true;
         }
 
-        // --- First move two-square advance
         if (isFirstMove &&
                 destinationCol == this.col &&
                 destinationRow == this.row + 2 * direction &&
@@ -28,7 +26,6 @@ public class Pawn extends Piece {
             return true;
         }
 
-        // --- Captures (diagonal)
         if (Math.abs(destinationCol - this.col) == 1 &&
                 destinationRow == this.row + direction) {
             Piece target = board.getPieceAt(destinationCol, destinationRow);
@@ -39,3 +36,4 @@ public class Pawn extends Piece {
         return false;
     }
 }
+
