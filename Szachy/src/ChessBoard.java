@@ -4,6 +4,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /*
     ischeck mozna zrobic tak
@@ -23,7 +24,8 @@ public class ChessBoard extends JPanel {
     private int turn = WHITE;
 
     public boolean isWhiteInCheck = false;
-    public boolean isBLackInCheck = false;
+    public boolean isBlackInCheck = false;
+
 
     Piece selectedPiece = null;
     ArrayList<Piece> pieces = new ArrayList<Piece>();
@@ -122,9 +124,16 @@ public class ChessBoard extends JPanel {
                     int pieceRow = selectedPiece.row;
                     int pieceCol = selectedPiece.col;
                     if (selectedPiece.validateMove(col, row, ChessBoard.this)) {
+                        selectedPiece.target = getPieceAt(col, row);
                         selectedPiece.updatePieceLocation(col, row);
+                        selectedPiece.isFirstMove = false;
                         if (selectedPiece.target != null) {
                             pieces.remove(selectedPiece.target);
+                        }
+                        isWhiteInCheck = isWhiteKingAttacked();
+                        isBlackInCheck = isBlackKingAttacked();
+                        if(isWhiteInCheck ||  isBlackInCheck){
+                            System.out.println("check");
                         }
                         if (turn == WHITE){
                             turn = BLACK;
@@ -135,6 +144,7 @@ public class ChessBoard extends JPanel {
                         selectedPiece.updatePieceLocation(pieceCol, pieceRow);
                         System.out.println("Invalid move");
                     }
+                    selectedPiece.moves.clear();
                     selectedPiece = null;
                     repaint();
                 }
@@ -151,5 +161,44 @@ public class ChessBoard extends JPanel {
                 }
              }
         });
+    }
+
+    public boolean isWhiteKingAttacked(){
+        Piece king = null;
+        for (Piece p: pieces){
+            if (p.isKing && p.color == 1){
+                king = p;
+            }
+        }
+        for (Piece p: pieces){
+            if (p.color == 0 && !p.isKing){
+                p.getMoves();
+                for (int[] a : p.moves){
+                    if (a[0] == king.col && a[1] == king.row) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    public boolean isBlackKingAttacked(){
+        Piece king = null;
+        for (Piece p: pieces){
+            if (p.isKing && p.color == 0){
+                king = p;
+            }
+        }
+        for (Piece p: pieces){
+            if (p.color == 1 && !p.isKing){
+                p.getMoves();
+                for (int[] a : p.moves){
+                    if (a[0] == king.col && a[1] == king.row) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

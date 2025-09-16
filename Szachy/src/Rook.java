@@ -1,4 +1,5 @@
 public class Rook extends Piece{
+
     public Rook(int color ,int x, int y, ChessBoard board) {
         super(color, x, y, board);
         if (color == 1){
@@ -18,7 +19,6 @@ public class Rook extends Piece{
                     return false;
                 }
             }
-            canCastle = false;
             return verifyTarget(board, destinationCol, destinationRow);
         }
 
@@ -30,7 +30,6 @@ public class Rook extends Piece{
                     return false; // path blocked
                 }
             }
-            canCastle = false;
             return verifyTarget(board, destinationCol, destinationRow);
         }
 

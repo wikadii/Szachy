@@ -1,50 +1,40 @@
-public class Pawn extends Piece{
-    Boolean isFirstMove;
-
-    public Pawn(int color ,int x, int y, ChessBoard board) {
+public class Pawn extends Piece {
+    public Pawn(int color, int x, int y, ChessBoard board) {
         super(color, x, y, board);
-        if (color == 1){
+        if (color == 1) {
             image = getImage("images/whitePawn.png");
-        }
-        else {
+        } else {
             image = getImage("images/pawn.png");
         }
         isFirstMove = true;
     }
 
     public Boolean validateMove(int destinationCol, int destinationRow, ChessBoard board) {
-        if (isFirstMove) {
-            if (this.color != WHITE){
-                if (this.row - destinationRow == 2 && this.col - destinationCol == 0|| this.row - destinationRow == 1 && this.col - destinationCol == 0 && board.isEmpty(destinationCol, destinationRow)){
-                    isFirstMove = false;
-                    return true;
-                }
-            }
-            else{
-                if (destinationRow - this.row == 2 && this.col - destinationCol == 0 || destinationRow - this.row == 1 && this.col - destinationCol == 0 && board.isEmpty(destinationCol, destinationRow)){
-                    isFirstMove = false;
-                    return true;
-                }
-            }
-        }
-        else{
-            if (this.color == BLACK){
-                if (this.row - destinationRow == 1 && this.col - destinationCol == 0 && board.isEmpty(destinationCol, destinationRow)){
-                    isFirstMove = false;
-                    return true;
-                }
-            }
-            else{
-                if (destinationRow - this.row == 1 && this.col - destinationCol == 0 && board.isEmpty(destinationCol, destinationRow)){
-                    isFirstMove = false;
-                    return true;
-                }
-            }
+        int direction = (color == WHITE) ? 1 : -1;
+
+        // --- Standard one-square move
+        if (destinationCol == this.col &&
+                destinationRow == this.row + direction &&
+                board.isEmpty(destinationCol, destinationRow)) {
+            return true;
         }
 
-        if (Math.abs(destinationRow - this.row) * Math.abs(destinationCol - this.col) == 1){
-            target = board.getPieceAt(destinationCol, destinationRow);
-            return target != null;
+        // --- First move two-square advance
+        if (isFirstMove &&
+                destinationCol == this.col &&
+                destinationRow == this.row + 2 * direction &&
+                board.isEmpty(destinationCol, destinationRow) &&
+                board.isEmpty(destinationCol, this.row + direction)) {
+            return true;
+        }
+
+        // --- Captures (diagonal)
+        if (Math.abs(destinationCol - this.col) == 1 &&
+                destinationRow == this.row + direction) {
+            Piece target = board.getPieceAt(destinationCol, destinationRow);
+            if (target != null && target.color != this.color) {
+                return true;
+            }
         }
         return false;
     }

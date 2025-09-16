@@ -15,11 +15,11 @@ public class Piece {
     public int row, col;
     public int color;
 
-    public boolean canCastle = true;
-
+    public Boolean isFirstMove = true;
+    public Boolean isKing = false;
     private ChessBoard board;
 
-    public ArrayList<int[]> moves;
+    public ArrayList<int[]> moves = new ArrayList<>();
 
     public Piece(int color ,int col, int row, ChessBoard board) {
         this.color = color;
@@ -45,13 +45,21 @@ public class Piece {
         return false;
     }
     public Boolean verifyTarget(ChessBoard board, int destinationCol, int destinationRow) {
-        target = board.getPieceAt(destinationCol, destinationRow);
-        if (target != null){
-            return !(target.color == color);
+        if (board.getPieceAt(destinationCol, destinationRow) != null){
+            return !(board.getPieceAt(destinationCol, destinationRow).color == color);
         }
         else{
             return true;
         }
     }
 
+    public void getMoves() {
+        for (int i = 1; i <= 8; i++){
+            for (int j = 1; j <= 8; j++){
+                if (validateMove(i, j, board)){
+                    moves.add(new int[]{i, j});
+                }
+            }
+        }
+    }
 }

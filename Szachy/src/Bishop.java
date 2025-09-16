@@ -14,26 +14,33 @@ public class Bishop extends Piece {
         int dCol = destinationCol - this.col;
         int dRow = destinationRow - this.row;
 
-        // Musi być ruch po przekątnej
+        // Must be a diagonal move
         if (Math.abs(dCol) != Math.abs(dRow)) {
             return false;
         }
 
-        // Kierunek ruchu
+        // If the move is to the same square
+        if (dCol == 0 && dRow == 0) {
+            return false;
+        }
+
+        // Direction of movement
         int stepCol = dCol > 0 ? 1 : -1;
         int stepRow = dRow > 0 ? 1 : -1;
 
         // Sprawdzenie czy droga wolna
         int c = this.col + stepCol;
         int r = this.row + stepRow;
-        while (c != destinationCol && r != destinationRow) {
+        // Loop while not at the destination square
+        while (c != destinationCol || r != destinationRow) {
             if (board.getPieceAt(c, r) != null) {
-                return false; // coś stoi na drodze
+                return false; // Something is in the way
             }
             c += stepCol;
             r += stepRow;
         }
 
+        // Sprawdzenie celu
         return verifyTarget(board, destinationCol, destinationRow);
     }
 }

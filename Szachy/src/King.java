@@ -1,6 +1,7 @@
 public class King extends Piece{
     public King(int color ,int x, int y, ChessBoard board) {
         super(color, x, y, board);
+        isKing = true;
         if (color == 1){
             image = getImage("images/white-king.png");
         }
@@ -8,6 +9,8 @@ public class King extends Piece{
             image = getImage("images/black-king.png");
         }
     }
+
+
     public Boolean validateMove(int destinationCol, int destinationRow, ChessBoard board){
         Piece rook;
         if (destinationRow == this.row && destinationCol != this.col && Math.abs(this.col - destinationCol) == 2) {
@@ -27,7 +30,7 @@ public class King extends Piece{
                 rook = board.getPieceAt(1, this.row);
             }
 
-            if (rook != null && rook.canCastle) {
+            if (rook != null && rook.isFirstMove) {
                 // Move the rook to its new position
                 int rookDestination = (step == 1) ? this.col + 1 : this.col - 1;
                 rook.updatePieceLocation(rookDestination, this.row);
