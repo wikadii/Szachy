@@ -12,34 +12,6 @@ public class King extends Piece{
 
 
     public Boolean validateMove(int destinationCol, int destinationRow, ChessBoard board){
-        Piece rook;
-        if (destinationRow == this.row && destinationCol != this.col && Math.abs(this.col - destinationCol) == 2) {
-            int step = (destinationCol > this.col) ? 1 : -1;
-
-            // Check empty squares between king and destination
-            for (int c = this.col + step; c != destinationCol; c += step) {
-                if (board.getPieceAt(c, this.row) != null) {
-                    return false;
-                }
-            }
-
-            // Get rook at correct side
-            if (step == 1) { // Kingside
-                rook = board.getPieceAt(8, this.row);
-            } else { // Queenside
-                rook = board.getPieceAt(1, this.row);
-            }
-
-            if (rook != null && rook.isFirstMove) {
-                // Move the rook to its new position
-                int rookDestination = (step == 1) ? this.col + 1 : this.col - 1;
-                rook.updatePieceLocation(rookDestination, this.row);
-                return verifyTarget(board, destinationCol, destinationRow);
-            }
-
-            return false;
-        }
-
         if (Math.abs(destinationCol - this.col) + Math.abs(destinationRow - this.row) == 1
                 || Math.abs(destinationCol - this.col) * Math.abs(destinationRow - this.row) == 1){
             return verifyTarget(board,  destinationCol, destinationRow);
@@ -47,4 +19,45 @@ public class King extends Piece{
         return false;
     }
 
+    public boolean canCastle(ChessBoard board, boolean kingside) {
+        if (!this.isFirstMove) return false;
+
+        int rookCol = kingside ? 8 : 1;
+        int step = kingside ? 1 : -1;
+        Piece rook = board.getPieceAt(rookCol, this.row);
+
+        if (rook == null || rook.isKing || !rook.isFirstMove) return false;
+
+        for (int c = this.col + step; c != rookCol; c += step) {
+            if (board.getPieceAt(c, this.row) != null) return false;
+        }
+
+        for (int c = this.col; c != this.col + 2 * step; c += step) {
+            int oldCol = this.col;
+            this.updatePieceLocation(c, this.row);
+
+            boolean inCheck = (this.color == board.WHITE)
+                    ? board.isWhiteKingAttacked()
+                    : board.isBlackKingAttacked();
+
+            this.updatePieceLocation(oldCol, this.row);
+            if (inCheck) return false;
+        }
+        return true;
+    }
+
+    public void performCastle(ChessBoard board, boolean kingside) {
+        int step = kingside ? 1 : -1;
+        int rookCol = kingside ? 8 : 1;
+        Piece rook = board.getPieceAt(rookCol, this.row);
+
+        int newKingCol = this.col + 2 * step;
+        int newRookCol = this.col + step;
+
+        this.updatePieceLocation(newKingCol, this.row);
+        rook.updatePieceLocation(newRookCol, this.row);
+
+        this.isFirstMove = false;
+        rook.isFirstMove = false;
+    }
 }

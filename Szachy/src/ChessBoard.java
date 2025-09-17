@@ -4,13 +4,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
-import java.util.Arrays;
 
-/*
-    ischeck mozna zrobic tak
-    col , row krola jednego i drugiego - petla przez pieces - jezeli validate(colKrola, rowKrola) == true return ze jest szach
-    i ewentualnie cofnij ruch, mata to sie jeszcze wymysli xd
-    */
 
 public class ChessBoard extends JPanel {
     public final int BOARD_WIDTH = 480;
@@ -137,6 +131,10 @@ public class ChessBoard extends JPanel {
                 return false;
             }
         }
+        selectedPiece.updatePieceLocation(pieceCol, pieceRow);
+        if (selectedPiece.target != null) {
+            pieces.add(selectedPiece.target);
+        }
         return true;
     }
 
@@ -144,6 +142,8 @@ public class ChessBoard extends JPanel {
         this.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
+                int status = getGameStatus();
+                System.out.println(status);
                 int col = (e.getX() / TILE_SIZE) + 1;
                 int row = 8 - (e.getY() / TILE_SIZE);
 
@@ -156,6 +156,8 @@ public class ChessBoard extends JPanel {
                 }
             }
 
+
+
             @Override
             public void mouseReleased(MouseEvent e) {
                 if (selectedPiece != null) {
@@ -163,13 +165,25 @@ public class ChessBoard extends JPanel {
                     int row = 8 - (e.getY() / TILE_SIZE);
                     int pieceRow = selectedPiece.row;
                     int pieceCol = selectedPiece.col;
-                    if (selectedPiece.validateMove(col, row, ChessBoard.this) && simulateMove(col, row, selectedPiece)) {
-                        selectedPiece.isFirstMove = false;
-                        if (turn == WHITE) {
-                            turn = BLACK;
+                    if (selectedPiece instanceof King && Math.abs(col - pieceCol) == 2 && row == pieceRow) {
+                        King king = (King) selectedPiece;
+                        boolean kingside = col > pieceCol;
+                        if (king.canCastle(ChessBoard.this, kingside)) {
+                            king.performCastle(ChessBoard.this, kingside);
+                            changeTurn();
                         } else {
-                            turn = WHITE;
+                            king.updatePieceLocation(pieceCol, pieceRow);
+                            System.out.println("Invalid castle");
                         }
+                    }
+                    else if (selectedPiece.validateMove(col, row, ChessBoard.this) && simulateMove(col, row, selectedPiece)) {
+                        selectedPiece.isFirstMove = false;
+                        selectedPiece.target = getPieceAt(col, row);
+                        selectedPiece.updatePieceLocation(col, row);
+                        if (selectedPiece.target != null) {
+                            pieces.remove(selectedPiece.target);
+                        }
+                        changeTurn();
                     } else {
                         selectedPiece.updatePieceLocation(pieceCol, pieceRow);
                         System.out.println("Invalid move");
@@ -192,14 +206,25 @@ public class ChessBoard extends JPanel {
         });
     }
 
-    public boolean isWhiteKingAttacked() {
-        Piece king = null;
+    public void changeTurn(){
+        if (turn == WHITE) {
+            turn = BLACK;
+        } else {
+            turn = WHITE;
+        }
+    }
+
+    Piece getKing(int Color){
         for (Piece p : pieces) {
-            if (p.isKing && p.color == 1) {
-                king = p;
-                break;
+            if (p.isKing && p.color == Color) {
+                return p;
             }
         }
+        return null;
+    }
+
+    public boolean isWhiteKingAttacked() {
+        Piece king = getKing(WHITE);
         if (king == null) return false;
         for (Piece p : pieces) {
             if (p.color == 0 && !p.isKing) {
@@ -209,19 +234,14 @@ public class ChessBoard extends JPanel {
                         return true;
                     }
                 }
+                p.moves.clear();
             }
         }
         return false;
     }
 
     public boolean isBlackKingAttacked() {
-        Piece king = null;
-        for (Piece p : pieces) {
-            if (p.isKing && p.color == 0) {
-                king = p;
-                break;
-            }
-        }
+        Piece king = getKing(BLACK);
         if (king == null) return false;
         for (Piece p : pieces) {
             if (p.color == 1 && !p.isKing) {
@@ -234,5 +254,36 @@ public class ChessBoard extends JPanel {
             }
         }
         return false;
+    }
+
+    public int getGameStatus(){
+        // 0 - gra normalnie sie toczy, 1 - checkmate, 2 -stalemate
+        if (turn == WHITE) {
+            for (Piece p : new ArrayList<>(pieces)) {
+                if (p.color == WHITE) {
+                    p.getMoves();
+                    for (int[] a : p.moves) {
+                        if (simulateMove(a[0], a[1], p)) {
+                            return 0;
+                        }
+                    }
+                }
+            }
+        }
+        else{
+            for (Piece p : new ArrayList<>(pieces)) {
+                if (p.color == BLACK) {
+                    p.getMoves();
+                    for (int[] a : p.moves) {
+                        if (simulateMove(a[0], a[1], p)) {
+                            return 0;
+                        }
+                    }
+                }
+            }
+        }
+        if (turn == WHITE && isWhiteInCheck) return 1;
+        if (turn == BLACK && isBlackInCheck) return 1;
+        return 2;
     }
 }
