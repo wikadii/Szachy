@@ -213,6 +213,12 @@ public class ChessBoard extends JPanel {
                         if (selectedPiece.target != null) {
                             pieces.remove(selectedPiece.target);
                         }
+                        if (selectedPiece instanceof Pawn) {
+                            if ((selectedPiece.color == WHITE && row == 8) || (selectedPiece.color == BLACK && row == 1)) {
+                                pieces.remove(selectedPiece);
+                                pieces.add(new Knight(selectedPiece.color, col, row, ChessBoard.this)); //tymczasowo
+                            }
+                        }
                         changeTurn();
                     } else {
                         selectedPiece.updatePieceLocation(pieceCol, pieceRow);
