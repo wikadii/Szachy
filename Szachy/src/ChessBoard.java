@@ -15,11 +15,12 @@ public class ChessBoard extends JPanel {
     public final int COL_NUM = 8;
     public final int ROW_NUM = 8;
 
+    public int gameState = 0;
+
     private int turn = WHITE;
 
     public boolean isWhiteInCheck = false;
     public boolean isBlackInCheck = false;
-
 
     Piece selectedPiece = null;
     ArrayList<Piece> pieces = new ArrayList<Piece>();
@@ -88,6 +89,20 @@ public class ChessBoard extends JPanel {
         }
     }
 
+    void printGamestate() {
+        if (gameState == 1) {
+            if (turn == BLACK) {
+                System.out.println("biale wygraly");
+            }
+            else{
+                    System.out.println("czarne wygraly");
+            }
+        }
+        else if (gameState == 2) {
+            System.out.println("remis pat");
+        }
+    }
+
     public Boolean isEmpty(int col, int row) {
         return getPieceAt(col, row) == null;
     }
@@ -116,7 +131,6 @@ public class ChessBoard extends JPanel {
                 if (selectedPiece.target != null) {
                     pieces.add(selectedPiece.target);
                 }
-                System.out.println("Invalid move");
                 return false;
             }
         }
@@ -142,16 +156,16 @@ public class ChessBoard extends JPanel {
         this.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                int status = getGameStatus();
-                System.out.println(status);
-                int col = (e.getX() / TILE_SIZE) + 1;
-                int row = 8 - (e.getY() / TILE_SIZE);
+                if (gameState == 0){
+                    int col = (e.getX() / TILE_SIZE) + 1;
+                    int row = 8 - (e.getY() / TILE_SIZE);
 
-                for (Piece p : pieces) {
-                    if (p.col == col && p.row == row && turn == p.color) {
-                        selectedPiece = p;
-                        System.out.println(selectedPiece);
-                        break;
+                    for (Piece p : pieces) {
+                        if (p.col == col && p.row == row && turn == p.color) {
+                            selectedPiece = p;
+                            System.out.println(selectedPiece);
+                            break;
+                        }
                     }
                 }
             }
@@ -190,6 +204,8 @@ public class ChessBoard extends JPanel {
                     }
                     selectedPiece = null;
                     repaint();
+                    gameState = getGameState();
+                    printGamestate();
                 }
             }
         });
@@ -256,7 +272,7 @@ public class ChessBoard extends JPanel {
         return false;
     }
 
-    public int getGameStatus(){
+    public int getGameState(){
         // 0 - gra normalnie sie toczy, 1 - checkmate, 2 -stalemate
         if (turn == WHITE) {
             for (Piece p : new ArrayList<>(pieces)) {
@@ -282,6 +298,8 @@ public class ChessBoard extends JPanel {
                 }
             }
         }
+        isWhiteInCheck = isWhiteKingAttacked();
+        isBlackInCheck = isBlackKingAttacked();
         if (turn == WHITE && isWhiteInCheck) return 1;
         if (turn == BLACK && isBlackInCheck) return 1;
         return 2;
