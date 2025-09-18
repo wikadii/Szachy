@@ -22,6 +22,7 @@ public class ChessBoard extends JPanel {
     public boolean isWhiteInCheck = false;
     public boolean isBlackInCheck = false;
 
+    Piece enPassantPawn = null;
     Piece selectedPiece = null;
     ArrayList<Piece> pieces = new ArrayList<Piece>();
 
@@ -31,6 +32,7 @@ public class ChessBoard extends JPanel {
         setPieces(pieces);
         move();
     }
+
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -164,6 +166,7 @@ public class ChessBoard extends JPanel {
                         if (p.col == col && p.row == row && turn == p.color) {
                             selectedPiece = p;
                             System.out.println(selectedPiece);
+
                             break;
                         }
                     }
@@ -190,7 +193,20 @@ public class ChessBoard extends JPanel {
                             System.out.println("Invalid castle");
                         }
                     }
+                    else if (selectedPiece instanceof Pawn && ((Pawn) selectedPiece).canEnPassant(col, row, ChessBoard.this))
+                    {
+                        pieces.remove(enPassantPawn);
+                        selectedPiece.updatePieceLocation(col, row);
+                        enPassantPawn = null;
+                        changeTurn();
+                    }
                     else if (selectedPiece.validateMove(col, row, ChessBoard.this) && simulateMove(col, row, selectedPiece)) {
+                        if (selectedPiece instanceof Pawn && selectedPiece.isFirstMove == true){
+                            enPassantPawn = selectedPiece;
+                        }
+                        else{
+                            enPassantPawn = null;
+                        }
                         selectedPiece.isFirstMove = false;
                         selectedPiece.target = getPieceAt(col, row);
                         selectedPiece.updatePieceLocation(col, row);
@@ -267,6 +283,7 @@ public class ChessBoard extends JPanel {
                         return true;
                     }
                 }
+                p.moves.clear();
             }
         }
         return false;

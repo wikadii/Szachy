@@ -10,6 +10,22 @@ public class Pawn extends Piece{
         isFirstMove = true;
     }
 
+    public boolean canEnPassant(int destinationCol, int destinationRow, ChessBoard board){
+        if (board.enPassantPawn == null) return false;
+
+        int direction = (color == WHITE) ? 1 : -1;
+
+        if (Math.abs(destinationCol - this.col) == 1 && destinationRow == this.row + direction) {
+            if (board.isEmpty(destinationCol, destinationRow)) {
+                if (board.enPassantPawn.row == this.row &&
+                        board.enPassantPawn.col == destinationCol) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public Boolean validateMove(int destinationCol, int destinationRow, ChessBoard board) {
         int direction = (color == WHITE) ? 1 : -1;
         if (destinationCol == this.col &&
