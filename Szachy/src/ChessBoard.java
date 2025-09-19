@@ -143,7 +143,6 @@ public class ChessBoard extends JPanel {
                 if (selectedPiece.target != null) {
                     pieces.add(selectedPiece.target);
                 }
-                System.out.println("Invalid move");
                 return false;
             }
         }
