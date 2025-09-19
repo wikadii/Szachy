@@ -18,7 +18,7 @@ public class MainPanel extends JPanel {
     public JPanel getPromotionPanel(int color) {
         JPanel promotionPanel = new JPanel();
         promotionPanel.setLayout(new BoxLayout(promotionPanel, BoxLayout.Y_AXIS));
-        ImageIcon originalIcon = new ImageIcon(getClass().getResource("/images/pawn.jpg"));
+        ImageIcon originalIcon = new ImageIcon(getClass().getResource("/images/white-rook.jpg"));
         Image scaledImage = originalIcon.getImage().getScaledInstance(cp.TILE_SIZE, cp.TILE_SIZE, Image.SCALE_SMOOTH);
         ImageIcon queen = new ImageIcon(scaledImage);
 
