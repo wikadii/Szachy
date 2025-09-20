@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class Piece {
-    public final int BLACK = 0;
     public final int WHITE = 1;
+    public final int BLACK = 0;
 
     Piece target;
     BufferedImage image;
@@ -16,12 +16,11 @@ public class Piece {
     public int color;
 
     public Boolean isFirstMove = true;
-    public Boolean isKing = false;
-    private ChessBoard board;
+    private ChessPanel board;
 
     public ArrayList<int[]> moves = new ArrayList<>();
 
-    public Piece(int color ,int col, int row, ChessBoard board) {
+    public Piece(int color ,int col, int row, ChessPanel board) {
         this.color = color;
         this.board = board;
         updatePieceLocation(col, row);
@@ -41,18 +40,16 @@ public class Piece {
         this.x = (col - 1) * tile_size;
         this.y = (8 - row) * tile_size;
     }
-    public Boolean validateMove(int destinationCol, int destinationRow, ChessBoard board) {
+    public Boolean validateMove(int destinationCol, int destinationRow, ChessPanel board) {
         return false;
     }
-    public Boolean verifyTarget(ChessBoard board, int destinationCol, int destinationRow) {
+    public Boolean verifyTarget(ChessPanel board, int destinationCol, int destinationRow) {
         if (board.getPieceAt(destinationCol, destinationRow) != null){
             return !(board.getPieceAt(destinationCol, destinationRow).color == color);
-        }
-        else{
+        } else {
             return true;
         }
     }
-
     public void getMoves() {
         this.moves.clear();
         for (int i = 1; i <= 8; i++){

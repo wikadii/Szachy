@@ -1,41 +1,28 @@
-// Bishop.java
 public class Bishop extends Piece {
-    public Bishop(int color, int col, int row, ChessBoard board) {
+    public Bishop(int color, int col, int row, ChessPanel board) {
         super(color, col, row, board);
-        if (color == WHITE) {
-            image = getImage("images/white-bishop.png");
-        } else {
-            image = getImage("images/black-bishop.png");
-        }
+
+        if (color == WHITE) image = getImage("images/white-bishop.png");
+        else image = getImage("images/black-bishop.png");
     }
 
     @Override
-    public Boolean validateMove(int destinationCol, int destinationRow, ChessBoard board) {
-        int dCol = destinationCol - this.col;
-        int dRow = destinationRow - this.row;
+    public Boolean validateMove(int destinationCol, int destinationRow, ChessPanel board) {
+        int colChange = destinationCol - col;
+        int rowChange = destinationRow - row;
+        int stepCol = Integer.signum(colChange);
+        int stepRow = Integer.signum(rowChange);
 
-        if (Math.abs(dCol) != Math.abs(dRow)) {
+        if (Math.abs(colChange) != Math.abs(rowChange) || colChange == 0) {
             return false;
         }
 
-        if (dCol == 0 && dRow == 0) {
-            return false;
+        for (int currentCol = col + stepCol, currentRow = row + stepRow;
+             currentCol != destinationCol && currentRow != destinationRow;
+             currentCol += stepCol, currentRow += stepRow) {
+
+            if (board.getPieceAt(currentCol, currentRow) != null) return false;
         }
-
-        int stepCol = dCol > 0 ? 1 : -1;
-        int stepRow = dRow > 0 ? 1 : -1;
-
-        int c = this.col + stepCol;
-        int r = this.row + stepRow;
-        // Loop while not at the destination square
-        while (c != destinationCol || r != destinationRow) {
-            if (board.getPieceAt(c, r) != null) {
-                return false; // Something is in the way
-            }
-            c += stepCol;
-            r += stepRow;
-        }
-
         return verifyTarget(board, destinationCol, destinationRow);
     }
 }

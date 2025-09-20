@@ -1,39 +1,28 @@
 public class Rook extends Piece{
 
-    public Rook(int color ,int x, int y, ChessBoard board) {
+    public Rook(int color ,int x, int y, ChessPanel board) {
         super(color, x, y, board);
-        if (color == 1){
-            image = getImage("images/white-rook.png");
-        } else {
-            image = getImage("images/black-rook.png");
-        }
+
+        if (color == 1) image = getImage("images/white-rook.png");
+        else image = getImage("images/black-rook.png");
     }
-
     @Override
-    public Boolean validateMove(int destinationCol, int destinationRow, ChessBoard board) {
-        // Moving horizontally
-        if (destinationRow == this.row && destinationCol != this.col) {
-            int step = (destinationCol > this.col) ? 1 : -1;
-            for (int c = this.col + step; c != destinationCol; c += step) {
-                if (board.getPieceAt(c, this.row) != null) {
-                    return false;
-                }
-            }
-            return verifyTarget(board, destinationCol, destinationRow);
+    public Boolean validateMove(int destinationCol, int destinationRow, ChessPanel board) {
+        int colChange = destinationCol - col;
+        int rowChange = destinationRow - row;
+        int stepCol = Integer.signum(colChange);
+        int stepRow = Integer.signum(rowChange);
+        int steps = Math.max(Math.abs(colChange), Math.abs(rowChange));
+
+        if (colChange != 0 && rowChange != 0) return false;
+
+        for (int i = 1; i < steps; i++) {
+            int currentCol = col + i * stepCol;
+            int currentRow = row + i * stepRow;
+            if (board.getPieceAt(currentCol, currentRow) != null) return false;
         }
 
-        // Moving vertically
-        if (destinationCol == this.col && destinationRow != this.row) {
-            int step = (destinationRow > this.row) ? 1 : -1;
-            for (int r = this.row + step; r != destinationRow; r += step) {
-                if (board.getPieceAt(this.col, r) != null) {
-                    return false; // path blocked
-                }
-            }
-            return verifyTarget(board, destinationCol, destinationRow);
-        }
-
-        return false;
+        return verifyTarget(board, destinationCol, destinationRow);
     }
 
 }

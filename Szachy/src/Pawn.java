@@ -1,22 +1,17 @@
 public class Pawn extends Piece{
-    public Pawn(int color ,int x, int y, ChessBoard board) {
+    public Pawn(int color ,int x, int y, ChessPanel board) {
         super(color, x, y, board);
-        if (color == 1){
-            image = getImage("images/whitePawn.png");
-        }
-        else {
-            image = getImage("images/pawn.png");
-        }
+        if (color == 1) image = getImage("images/whitePawn.png");
+        else image = getImage("images/pawn.png");
         isFirstMove = true;
     }
-
-    public boolean canEnPassant(int destinationCol, int destinationRow, ChessBoard board){
-        if (board.enPassantPawn == null) return false;
-
+    public boolean canEnPassant(int destinationCol, int destinationRow, ChessPanel board){
         int direction = (color == WHITE) ? 1 : -1;
 
+        if (board.enPassantPawn == null) return false;
+
         if (Math.abs(destinationCol - this.col) == 1 && destinationRow == this.row + direction) {
-            if (board.isEmpty(destinationCol, destinationRow)) {
+            if (board.isSquareEmpty(destinationCol, destinationRow)) {
                 if (board.enPassantPawn.row == this.row &&
                         board.enPassantPawn.col == destinationCol) {
                     return true;
@@ -25,20 +20,18 @@ public class Pawn extends Piece{
         }
         return false;
     }
-
-    public Boolean validateMove(int destinationCol, int destinationRow, ChessBoard board) {
+    public Boolean validateMove(int destinationCol, int destinationRow, ChessPanel board) {
         int direction = (color == WHITE) ? 1 : -1;
         if (destinationCol == this.col &&
                 destinationRow == this.row + direction &&
-                board.isEmpty(destinationCol, destinationRow)) {
+                board.isSquareEmpty(destinationCol, destinationRow)) {
             return true;
         }
-
         if (isFirstMove &&
                 destinationCol == this.col &&
                 destinationRow == this.row + 2 * direction &&
-                board.isEmpty(destinationCol, destinationRow) &&
-                board.isEmpty(destinationCol, this.row + direction)) {
+                board.isSquareEmpty(destinationCol, destinationRow) &&
+                board.isSquareEmpty(destinationCol, this.row + direction)) {
             return true;
         }
 
