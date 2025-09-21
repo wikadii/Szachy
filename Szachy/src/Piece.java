@@ -11,6 +11,7 @@ public class Piece {
     Piece target;
     BufferedImage image;
 
+    public int value;
     public int x, y;
     public int row, col;
     public int color;

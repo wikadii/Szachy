@@ -2,7 +2,7 @@
 public class Queen extends Piece {
     public Queen(int color, int col, int row, ChessPanel board) {
         super(color, col, row, board);
-
+        value = 9;
         if (color == WHITE) image = getImage("images/white-queen.png");
         else image = getImage("images/black-queen.png");
     }

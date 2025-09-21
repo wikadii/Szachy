@@ -1,6 +1,7 @@
 public class King extends Piece{
     public King(int color ,int x, int y, ChessPanel board) {
         super(color, x, y, board);
+        value = 1;
         if (color == 1) image = getImage("images/white-king.png");
         else image = getImage("images/black-king.png");
     }

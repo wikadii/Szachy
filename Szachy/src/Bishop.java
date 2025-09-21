@@ -1,7 +1,7 @@
 public class Bishop extends Piece {
     public Bishop(int color, int col, int row, ChessPanel board) {
         super(color, col, row, board);
-
+        value = 3;
         if (color == WHITE) image = getImage("images/white-bishop.png");
         else image = getImage("images/black-bishop.png");
     }

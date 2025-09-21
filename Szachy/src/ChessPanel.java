@@ -109,7 +109,7 @@ public class ChessPanel extends JPanel {
         this.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                selectPiece(e);
+                if (gameState == 0) selectPiece(e);
             }
 
             @Override
@@ -185,6 +185,7 @@ public class ChessPanel extends JPanel {
         selectedPiece.target = getPieceAt(col, row);
         selectedPiece.updatePieceLocation(col, row);
         if (selectedPiece.target != null){
+
             pieces.remove(selectedPiece.target);
             hasCaptured = true;
         }
@@ -291,6 +292,7 @@ public class ChessPanel extends JPanel {
         1 - checkmate
         2 - remis
         */
+
         if (fiftyMovesCounter == 50) return 2;
         ArrayList<Piece> piecesCopy = new ArrayList<>(pieces);
         for (Piece piece : piecesCopy) {

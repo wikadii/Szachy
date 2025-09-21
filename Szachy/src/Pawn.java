@@ -1,6 +1,7 @@
 public class Pawn extends Piece{
     public Pawn(int color ,int x, int y, ChessPanel board) {
         super(color, x, y, board);
+        value = 1;
         if (color == 1) image = getImage("images/whitePawn.png");
         else image = getImage("images/pawn.png");
         isFirstMove = true;

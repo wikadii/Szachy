@@ -6,8 +6,8 @@ public class MainPanel extends JPanel {
 
     public ChessPanel cp;
     ArrayList<Piece> pieces;
-    public int whiteTime = 60 * 10;
-    public int blackTime = 60 * 10;
+    public int whiteTime = 2;
+    public int blackTime = 2;
     public Timer gameTimer;
     JLabel whiteLabel;
     JLabel blackLabel;
@@ -32,7 +32,18 @@ public class MainPanel extends JPanel {
 
         whiteLabel.setText(formatTime(whiteTime));
         blackLabel.setText(formatTime(blackTime));
+
+        checkTime(whiteTime);
+        checkTime(blackTime);
     }
+
+   public void checkTime(int time){
+        if (time <= 0){
+            cp.gameState = 1;
+            cp.printGamestate();
+            gameTimer.stop();
+        }
+   }
 
     public void getPromotionPanel(Pawn pawn) {
         JPanel promotionPanel = new JPanel();
