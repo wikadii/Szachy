@@ -156,18 +156,33 @@ public class ChessPanel extends JPanel {
             repaint();
         }
     }
+
+    private void updateEnPassantFigure(int col, int row){
+        if (selectedPiece instanceof Pawn) {
+            if (selectedPiece.isFirstMove && Math.abs(selectedPiece.row - row) == 2){
+                enPassantPawn = selectedPiece;
+                return;
+            }
+            else enPassantPawn = null;
+        }
+        return;
+    }
+
+
     private boolean handleRegularMove(int col, int row) {
         if (!selectedPiece.validateMove(col, row, this) || !simulateMove(col, row, selectedPiece)) {
             return false;
         }
 
-        if (selectedPiece instanceof Pawn) {
-            if (selectedPiece.isFirstMove) enPassantPawn = selectedPiece;
-            else enPassantPawn = null;
+        updateEnPassantFigure(col, row);
 
+        selectedPiece.target = getPieceAt(col, row);
+        selectedPiece.updatePieceLocation(col, row);
+        if (selectedPiece.target != null) pieces.remove(selectedPiece.target);
+
+        if (selectedPiece instanceof Pawn) {
             if ((selectedPiece.color == WHITE && row == 8) || (selectedPiece.color == BLACK && row == 1)) {
-                selectedPiece.updatePieceLocation(selectedPiece.col, row);
-                //pieces.add(new Queen(selectedPiece.color, col, row, this));
+                selectedPiece.updatePieceLocation(col, row);
                 mainPanel.getPromotionPanel((Pawn) selectedPiece);
                 selectedPiece = null;
                 changeTurn();
@@ -176,13 +191,7 @@ public class ChessPanel extends JPanel {
                 printGamestate();
                 return true;
             }
-        }else{
-            enPassantPawn = null;
         }
-
-        selectedPiece.target = getPieceAt(col, row);
-        selectedPiece.updatePieceLocation(col, row);
-        if (selectedPiece.target != null) pieces.remove(selectedPiece.target);
 
         selectedPiece.isFirstMove = false;
         selectedPiece = null;

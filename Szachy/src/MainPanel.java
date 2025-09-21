@@ -35,8 +35,9 @@ public class MainPanel extends JPanel {
                         case "knight": cp.pieces.add(new Knight(pawn.color, pawn.col, pawn.row, cp)); break;
                         case "bishop": cp.pieces.add(new Bishop(pawn.color, pawn.col, pawn.row, cp)); break;
                     }
-                    remove(promotionPanel);
-                    cp.repaint();
+                    this.remove(promotionPanel);
+
+                    this.repaint();
                 });
             promotionPanel.add(promotionButton);
         }
