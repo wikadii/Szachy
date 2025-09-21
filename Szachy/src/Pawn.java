@@ -1,7 +1,9 @@
 public class Pawn extends Piece{
+    ChessPanel board;
     public Pawn(int color ,int x, int y, ChessPanel board) {
         super(color, x, y, board);
         value = 1;
+        this.board = board;
         if (color == 1) image = getImage("images/whitePawn.png");
         else image = getImage("images/pawn.png");
         isFirstMove = true;
@@ -44,6 +46,23 @@ public class Pawn extends Piece{
             }
         }
         return false;
+    }
+
+    @Override
+    public void getMoves() {
+        super.getMoves();
+
+        int direction = (color == WHITE) ? 1 : -1;
+
+        if (board.enPassantPawn != null) {
+            int epCol = board.enPassantPawn.col;
+            int epRow = board.enPassantPawn.row;
+            if (Math.abs(epCol - col) == 1 && row + direction == ((color == WHITE) ? 6 : 3)) {
+                if (board.getPieceAt(epCol, epRow) == board.enPassantPawn) {
+                    moves.add(new int[]{epCol, row + direction});
+                }
+            }
+        }
     }
 }
 

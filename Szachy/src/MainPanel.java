@@ -6,8 +6,8 @@ public class MainPanel extends JPanel {
 
     public ChessPanel cp;
     ArrayList<Piece> pieces;
-    public int whiteTime = 2;
-    public int blackTime = 2;
+    public int whiteTime = 30 * 60;
+    public int blackTime = 30 * 60;
     public Timer gameTimer;
     JLabel whiteLabel;
     JLabel blackLabel;
@@ -23,7 +23,6 @@ public class MainPanel extends JPanel {
         this.setBackground(Color.gray);
         this.add(cp);
         getTimerPanels();
-
     }
 
     public void tick(){
@@ -41,6 +40,9 @@ public class MainPanel extends JPanel {
         if (time <= 0){
             cp.gameState = 1;
             cp.printGamestate();
+            gameTimer.stop();
+        }
+        if (cp.gameState != 0){
             gameTimer.stop();
         }
    }

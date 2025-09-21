@@ -27,6 +27,8 @@ public class ChessPanel extends JPanel {
     Piece enPassantPawn = null;
     Piece selectedPiece = null;
     ArrayList<Piece> pieces = new ArrayList<>();
+    private ArrayList<int[]> attackMoves = new ArrayList<>();
+    private ArrayList<int[]> highlightMoves = new ArrayList<>();
 
     MainPanel mainPanel;
 
@@ -82,18 +84,76 @@ public class ChessPanel extends JPanel {
                     g2D.setColor(Color.decode("#EEEED2"));
                     isBlack = true;
                 } else {
-                    g2D.setColor(Color.decode("#769656"));
+                    g2D.setColor(Color.decode("#ec94a3"));
                     isBlack = false;
                 }
                 g2D.fillRect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
             }
             isBlack = !isBlack;
         }
+        Piece whiteKing = getKing(WHITE);
+        Piece blackKing = getKing(BLACK);
+
+        if (isWhiteKingAttacked() && whiteKing != null) {
+            g2D.setColor(new Color(255, 0, 0, 128));
+            g2D.fillRect((whiteKing.col - 1) * TILE_SIZE, (8 - whiteKing.row) * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        }
+
+        if (isBlackKingAttacked() && blackKing != null) {
+            g2D.setColor(new Color(255, 0, 0, 128));
+            g2D.fillRect((blackKing.col - 1) * TILE_SIZE, (8 - blackKing.row) * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        }
+
+        g2D.setColor(new Color(221, 6, 241, 128));
+        int circleSize = TILE_SIZE / 4;
+        for (int[] move : highlightMoves) {
+            int col = move[0];
+            int row = move[1];
+            int x = (col - 1) * TILE_SIZE + (TILE_SIZE - circleSize) / 2;
+            int y = (8 - row) * TILE_SIZE + (TILE_SIZE - circleSize) / 2;
+            g2D.fillOval(x, y, circleSize, circleSize);
+        }
+
+        g2D.setColor(new Color(153, 5, 237, 192));
+        int bigCircle = TILE_SIZE * 6 / 7;
+        Graphics2D g = (Graphics2D) g2D.create();
+        g.setStroke(new BasicStroke(3));
+
+        for (int[] move : attackMoves) {
+            int col = move[0];
+            int row = move[1];
+            int x = (col - 1) * TILE_SIZE + (TILE_SIZE - bigCircle) / 2;
+            int y = (8 - row) * TILE_SIZE + (TILE_SIZE - bigCircle) / 2;
+            g.drawOval(x, y, bigCircle, bigCircle);
+        }
+
     }
     public boolean simulateMove(int col, int row, Piece piece) {
         int originalCol = piece.col;
         int originalRow = piece.row;
         Piece targetPiece = getPieceAt(col, row);
+        Piece capturedEnPassant = null;
+        boolean castlingMove = false;
+        int rookOriginalCol = -1, rookNewCol = -1;
+
+        if (piece instanceof King && Math.abs(col - originalCol) == 2 && row == originalRow) {
+            King king = (King) piece;
+            boolean kingside = col > originalCol;
+            if (king.canCastle(this, kingside)) {
+                castlingMove = true;
+                rookOriginalCol = kingside ? 8 : 1;
+                rookNewCol = kingside ? col - 1 : col + 1;
+                Piece rook = getPieceAt(rookOriginalCol, row);
+                if (rook != null) rook.updatePieceLocation(rookNewCol, row);
+            } else {
+                return false;
+            }
+        }
+
+        if (piece instanceof Pawn && ((Pawn) piece).canEnPassant(col, row, this)) {
+            capturedEnPassant = enPassantPawn;
+            if (capturedEnPassant != null) pieces.remove(capturedEnPassant);
+        }
 
         piece.updatePieceLocation(col, row);
         if (targetPiece != null) pieces.remove(targetPiece);
@@ -102,6 +162,11 @@ public class ChessPanel extends JPanel {
 
         piece.updatePieceLocation(originalCol, originalRow);
         if (targetPiece != null) pieces.add(targetPiece);
+        if (capturedEnPassant != null) pieces.add(capturedEnPassant);
+        if (castlingMove) {
+            Piece rook = getPieceAt(rookNewCol, row);
+            if (rook != null) rook.updatePieceLocation(rookOriginalCol, row);
+        }
 
         return !kingInCheck;
     }
@@ -109,15 +174,19 @@ public class ChessPanel extends JPanel {
         this.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
-                if (gameState == 0) selectPiece(e);
+                if (gameState == 0 && SwingUtilities.isLeftMouseButton(e)) selectPiece(e);
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
+
+                if (!SwingUtilities.isLeftMouseButton(e)) return;
+
                 if (selectedPiece != null) {
                     int col = (e.getX() / TILE_SIZE) + 1;
                     int row = 8 - (e.getY() / TILE_SIZE);
-
+                    highlightMoves.clear();
+                    attackMoves.clear();
                     if (handleCastleMove(col, row)) return;
                     if (handleEnPassant(col, row)) return;
                     if (handleRegularMove(col, row)) return;
@@ -130,6 +199,9 @@ public class ChessPanel extends JPanel {
         this.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
+
+                if (!SwingUtilities.isLeftMouseButton(e)) return;
+
                 if (selectedPiece != null) {
                     selectedPiece.x = e.getX() - TILE_SIZE / 2;
                     selectedPiece.y = e.getY() - TILE_SIZE / 2;
@@ -150,12 +222,33 @@ public class ChessPanel extends JPanel {
                 break;
             }
         }
+        if (selectedPiece != null) {
+            selectedPiece.getMoves();
+            highlightMoves.clear();
+            for (int[] move : selectedPiece.moves) {
+                if (simulateMove(move[0], move[1], selectedPiece)) {
+                    highlightMoves.add(move);
+                }
+            }
+            attackMoves.clear();
+            for (int[] move : highlightMoves) {
+                Piece target = getPieceAt(move[0], move[1]);
+                if (target != null && target.color != turn) {
+                    attackMoves.add(move);
+                }
+            }
+        } else {
+            highlightMoves.clear();
+        }
+        repaint();
     }
     private void resetSelectedPiece() {
         if (selectedPiece != null) {
             selectedPiece.updatePieceLocation(selectedPiece.col, selectedPiece.row);
             selectedPiece = null;
             repaint();
+            highlightMoves.clear();
+            attackMoves.clear();
         }
     }
 

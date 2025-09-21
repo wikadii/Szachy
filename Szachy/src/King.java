@@ -5,11 +5,13 @@ public class King extends Piece{
         if (color == 1) image = getImage("images/white-king.png");
         else image = getImage("images/black-king.png");
     }
-
+    ChessPanel board;
     @Override
     public Boolean validateMove(int destinationCol, int destinationRow, ChessPanel board) {
         int colChange = Math.abs(destinationCol - col);
         int rowChange = Math.abs(destinationRow - row);
+
+        this.board = board;
 
         if ((colChange + rowChange == 1) || (colChange * rowChange == 1)) {
             return verifyTarget(board, destinationCol, destinationRow);
@@ -54,5 +56,15 @@ public class King extends Piece{
 
         this.isFirstMove = false;
         rook.isFirstMove = false;
+    }
+
+    @Override
+    public void getMoves() {
+        super.getMoves();
+
+        if (isFirstMove && !board.isKingAttacked(color)) {
+            if (canCastle(board, true)) moves.add(new int[]{col + 2, row});
+            if (canCastle(board, false)) moves.add(new int[]{col - 2, row});
+        }
     }
 }

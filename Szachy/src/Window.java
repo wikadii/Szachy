@@ -11,5 +11,6 @@ public class Window extends JFrame {
         this.setLocationRelativeTo(null);
         this.add(mainPanel);
         this.setVisible(true);
+
     }
 }
