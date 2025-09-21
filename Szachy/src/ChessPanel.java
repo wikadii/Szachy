@@ -291,7 +291,7 @@ public class ChessPanel extends JPanel {
         1 - checkmate
         2 - remis
         */
-        if (fiftyMovesCounter == 5) return 2;
+        if (fiftyMovesCounter == 50) return 2;
         ArrayList<Piece> piecesCopy = new ArrayList<>(pieces);
         for (Piece piece : piecesCopy) {
             if (piece.color == turn) {
