@@ -18,9 +18,11 @@ public class ChessPanel extends JPanel {
     public int turn = WHITE;
 
     public int gameState = 0;
+    public int fiftyMovesCounter = 0;
 
     public boolean isWhiteInCheck = false;
     public boolean isBlackInCheck = false;
+    public boolean hasCaptured = false;
 
     Piece enPassantPawn = null;
     Piece selectedPiece = null;
@@ -168,6 +170,10 @@ public class ChessPanel extends JPanel {
         return;
     }
 
+    private void updateFiftyMovesRule(){
+        if (selectedPiece instanceof Pawn || hasCaptured) fiftyMovesCounter = 0;
+        else fiftyMovesCounter++;
+    }
 
     private boolean handleRegularMove(int col, int row) {
         if (!selectedPiece.validateMove(col, row, this) || !simulateMove(col, row, selectedPiece)) {
@@ -178,25 +184,24 @@ public class ChessPanel extends JPanel {
 
         selectedPiece.target = getPieceAt(col, row);
         selectedPiece.updatePieceLocation(col, row);
-        if (selectedPiece.target != null) pieces.remove(selectedPiece.target);
+        if (selectedPiece.target != null){
+            pieces.remove(selectedPiece.target);
+            hasCaptured = true;
+        }
+        else hasCaptured = false;
 
         if (selectedPiece instanceof Pawn) {
             if ((selectedPiece.color == WHITE && row == 8) || (selectedPiece.color == BLACK && row == 1)) {
                 selectedPiece.updatePieceLocation(col, row);
                 mainPanel.getPromotionPanel((Pawn) selectedPiece);
-                selectedPiece = null;
-                changeTurn();
-                repaint();
-                gameState = getGameState();
-                printGamestate();
-                return true;
             }
         }
 
         selectedPiece.isFirstMove = false;
-        selectedPiece = null;
         changeTurn();
         repaint();
+        updateFiftyMovesRule();
+        selectedPiece = null;
         gameState = getGameState();
         printGamestate();
         return true;
@@ -204,6 +209,7 @@ public class ChessPanel extends JPanel {
     private boolean handleEnPassant(int col, int row) {
         if (selectedPiece instanceof Pawn && ((Pawn) selectedPiece).canEnPassant(col, row, this)) {
             pieces.remove(enPassantPawn);
+            hasCaptured = true;
             selectedPiece.updatePieceLocation(col, row);
             enPassantPawn = null;
             selectedPiece.isFirstMove = false;
@@ -224,9 +230,11 @@ public class ChessPanel extends JPanel {
                 king.castle(this, kingside);
                 changeTurn();
                 repaint();
+                hasCaptured = false;
+                updateFiftyMovesRule();
+                selectedPiece = null;
                 gameState = getGameState();
                 printGamestate();
-                selectedPiece = null;
                 return true;
             } else {
                 resetSelectedPiece();
@@ -281,9 +289,11 @@ public class ChessPanel extends JPanel {
         /*
         0 - gra sie toczy
         1 - checkmate
-        2 - stalemate
+        2 - remis
         */
-        for (Piece piece : pieces) {
+        if (fiftyMovesCounter == 5) return 2;
+        ArrayList<Piece> piecesCopy = new ArrayList<>(pieces);
+        for (Piece piece : piecesCopy) {
             if (piece.color == turn) {
                 piece.getMoves();
                 for (int[] move : piece.moves) {
