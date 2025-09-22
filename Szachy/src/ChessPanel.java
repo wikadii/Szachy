@@ -19,6 +19,8 @@ public class ChessPanel extends JPanel {
 
     public int gameState = 0;
     public int fiftyMovesCounter = 0;
+    public int whiteMaterial = 0;
+    public int blackMaterial = 0;
 
     public boolean isWhiteInCheck = false;
     public boolean isBlackInCheck = false;
@@ -379,14 +381,27 @@ public class ChessPanel extends JPanel {
         if (gameState == 1) System.out.println(turn == BLACK ? "Białe wygrały" : "Czarne wygrały");
         else if (gameState == 2) System.out.println("Remis (pat)");
     }
+
+    private boolean isInsufficientMaterial() {
+        boolean whiteHasOnlyBishopOrKnight = whiteMaterial == 3 && getAmountOfPieces(WHITE) == 1;
+        boolean blackHasOnlyBishopOrKnight = blackMaterial == 3 && getAmountOfPieces(BLACK) == 1;
+
+        boolean whiteHasNoMaterial = whiteMaterial == 0;
+        boolean blackHasNoMaterial = blackMaterial == 0;
+
+        return (whiteHasNoMaterial && blackHasNoMaterial) ||
+                (whiteHasOnlyBishopOrKnight && (blackHasNoMaterial || blackHasOnlyBishopOrKnight)) ||
+                (blackHasOnlyBishopOrKnight && (whiteHasNoMaterial || whiteHasOnlyBishopOrKnight));
+    }
+
     public int getGameState() {
         /*
         0 - gra sie toczy
         1 - checkmate
         2 - remis
         */
-
-        if (fiftyMovesCounter == 50) return 2;
+        calculateMaterial();
+        if (fiftyMovesCounter == 50 || isInsufficientMaterial()) return 2;
         ArrayList<Piece> piecesCopy = new ArrayList<>(pieces);
         for (Piece piece : piecesCopy) {
             if (piece.color == turn) {
@@ -405,4 +420,28 @@ public class ChessPanel extends JPanel {
         return pieces;
     }
 
+    public void calculateMaterial(){
+        whiteMaterial = 0;
+        blackMaterial = 0;
+        for (Piece p: pieces){
+            if (!(p instanceof King) && p != null){
+                if (p.color == WHITE){
+                    whiteMaterial += p.value;
+                }
+                else{
+                    blackMaterial += p.value;
+                }
+            }
+        }
+    }
+
+    public int getAmountOfPieces(int color){
+        int piecesCounter = 0;
+        for (Piece p : pieces){
+            if (p.color == color && !(p instanceof King)){
+                piecesCounter++;
+            }
+        }
+        return piecesCounter;
+    }
 }
