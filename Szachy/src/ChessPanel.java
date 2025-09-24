@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -38,6 +39,7 @@ public class ChessPanel extends JPanel {
         this.mainPanel = mainPanel;
         this.setPreferredSize(new Dimension(BOARD_WIDTH, BOARD_HEIGHT));
         this.setBackground(Color.decode("#80807e"));
+        this.setBorder(new LineBorder(Color.BLACK, 4));
         setPieces(pieces);
         move();
     }
@@ -86,7 +88,7 @@ public class ChessPanel extends JPanel {
                     g2D.setColor(Color.decode("#EEEED2"));
                     isBlack = true;
                 } else {
-                    g2D.setColor(Color.decode("#ec94a3"));
+                    g2D.setColor(Color.decode("#FF69B4"));
                     isBlack = false;
                 }
                 g2D.fillRect(col * TILE_SIZE, row * TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -378,8 +380,24 @@ public class ChessPanel extends JPanel {
     public boolean isWhiteKingAttacked() { return isKingAttacked(WHITE); }
     public boolean isBlackKingAttacked() { return isKingAttacked(BLACK); }
     public void printGamestate(){
-        if (gameState == 1) System.out.println(turn == BLACK ? "Białe wygrały" : "Czarne wygrały");
-        else if (gameState == 2) System.out.println("Remis (pat)");
+        if (gameState == 1) {
+            if (mainPanel.whiteTime <= 0) {
+                mainPanel.showGameResult("Czarne wygrywają przez czas");
+            } else if (mainPanel.blackTime <= 0) {
+                mainPanel.showGameResult("Białe wygrywają przez czas");
+            } else {
+                mainPanel.showGameResult(turn == BLACK ? "Białe wygrywają przez szach-mat" : "Czarne wygrywają przez szach-mat");
+            }
+        }
+        else if (gameState == 2) {
+            if (fiftyMovesCounter == 50) {
+                mainPanel.showGameResult("Remis – reguła 50 ruchów");
+            } else if (isInsufficientMaterial()) {
+                mainPanel.showGameResult("Remis – niewystarczający materiał");
+            } else {
+                mainPanel.showGameResult("Remis – pat");
+            }
+        }
     }
 
     private boolean isInsufficientMaterial() {

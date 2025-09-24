@@ -5,7 +5,7 @@ public class Pawn extends Piece{
         value = 1;
         this.board = board;
         if (color == 1) image = getImage("images/whitePawn.png");
-        else image = getImage("images/pawn.png");
+        else image = getImage("images/black-pawn.png");
         isFirstMove = true;
     }
     public boolean canEnPassant(int destinationCol, int destinationRow, ChessPanel board){

@@ -1,6 +1,8 @@
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class MainPanel extends JPanel {
 
@@ -11,18 +13,46 @@ public class MainPanel extends JPanel {
     public Timer gameTimer;
     JLabel whiteLabel;
     JLabel blackLabel;
+    JLabel gameResultLabel;
 
-    public MainPanel() {
+    public MainPanel(int initialTime) {
         cp = new ChessPanel(this);
-        gameTimer = new Timer(1000, e -> tick());
         pieces = cp.getPieces();
         cp.setBounds(90,40,cp.BOARD_WIDTH,cp.BOARD_HEIGHT);
+
+        if (initialTime > 0) {
+            whiteTime = initialTime;
+            blackTime = initialTime;
+        } else {
+            whiteTime = blackTime = 999 * 60;
+        }
+
+        gameTimer = new Timer(1000, e -> tick());
         gameTimer.start();
+
         this.setPreferredSize(new Dimension(1000,600));
         this.setLayout(null);
-        this.setBackground(Color.gray);
+        this.setBackground(Color.decode("#FFCFE7"));
         this.add(cp);
+
+        gameResultLabel = new JLabel("");
+        gameResultLabel.setFont(new Font("SansSerif", Font.BOLD, 20));
+        gameResultLabel.setForeground(Color.BLACK);
+        gameResultLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+        JPanel resultPanel = new JPanel();
+        resultPanel.setLayout(new BorderLayout());
+        resultPanel.setBounds(600, 200, 350, 100);
+        resultPanel.setBackground(Color.decode("#FCE4EC"));
+        resultPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 3));
+        resultPanel.add(gameResultLabel, BorderLayout.CENTER);
+
+        this.add(resultPanel);
         getTimerPanels();
+    }
+
+    public void showGameResult(String resultText) {
+        gameResultLabel.setText(resultText);
     }
 
     public void tick(){
@@ -50,7 +80,7 @@ public class MainPanel extends JPanel {
     public void getPromotionPanel(Pawn pawn) {
         JPanel promotionPanel = new JPanel();
         promotionPanel.setLayout(new BoxLayout(promotionPanel, BoxLayout.Y_AXIS));
-        promotionPanel.setBackground(Color.gray);
+        promotionPanel.setBackground(Color.decode("#FFCFE7"));
         promotionPanel.setBounds(0, 40, cp.TILE_SIZE, (cp.TILE_SIZE * 4) + 40);
 
         String[] pieceNames = {"queen", "rook", "knight", "bishop"};
@@ -66,6 +96,10 @@ public class MainPanel extends JPanel {
                     }
                     this.remove(promotionPanel);
                     this.repaint();
+
+                    cp.gameState = cp.getGameState();
+                    cp.printGamestate();
+                    cp.repaint();
                 });
             promotionPanel.add(promotionButton);
         }
@@ -74,7 +108,7 @@ public class MainPanel extends JPanel {
         this.repaint();
     }
     public JButton createButton(String pieceName) {
-        ImageIcon image = new ImageIcon(getClass().getResource("images/white-" + pieceName + ".jpg"));
+        ImageIcon image = new ImageIcon(Objects.requireNonNull(getClass().getResource("images/white-" + pieceName + ".jpg")));
         ImageIcon pieceImage = new ImageIcon(image.getImage());
 
         JButton pieceButton = new JButton(pieceImage);
@@ -96,18 +130,20 @@ public class MainPanel extends JPanel {
         JPanel timePanel = new JPanel();
         if (color == 0){
             timePanel.setBounds(600, 75, 150,40);
-            timePanel.setBackground(Color.pink);
+            timePanel.setBackground(Color.decode("#FF69B4"));
+            timePanel.setBorder(new LineBorder(Color.BLACK, 3));
             blackLabel = new JLabel(formatTime(blackTime));
             blackLabel.setFont(new Font("SansSerif", Font.BOLD, 30));
-            blackLabel.setBorder(BorderFactory.createEmptyBorder(-5,0,0,0));
+            blackLabel.setBorder(BorderFactory.createEmptyBorder(-8,0,0,0));
             timePanel.add(blackLabel);
         }
         else{
             timePanel.setBounds(600, 445, 150,40);
-            timePanel.setBackground(Color.pink);
+            timePanel.setBackground(Color.decode("#FF69B4"));
+            timePanel.setBorder(new LineBorder(Color.BLACK, 3));
             whiteLabel = new JLabel(formatTime(whiteTime));
             whiteLabel.setFont(new Font("SansSerif", Font.BOLD, 30));
-            whiteLabel.setBorder(BorderFactory.createEmptyBorder(-5,0,0,0));
+            whiteLabel.setBorder(BorderFactory.createEmptyBorder(-8,0,0,0));
             timePanel.add(whiteLabel);
         }
         return timePanel;

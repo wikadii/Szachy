@@ -1,20 +1,23 @@
 public class King extends Piece{
     public King(int color ,int x, int y, ChessPanel board) {
         super(color, x, y, board);
-        value = 1;
+        value = 0;
+        this.board = board;
         if (color == 1) image = getImage("images/white-king.png");
         else image = getImage("images/black-king.png");
     }
     ChessPanel board;
     @Override
     public Boolean validateMove(int destinationCol, int destinationRow, ChessPanel board) {
-        int colChange = Math.abs(destinationCol - col);
-        int rowChange = Math.abs(destinationRow - row);
+        int dx = Math.abs(destinationCol - this.col);
+        int dy = Math.abs(destinationRow - this.row);
 
-        this.board = board;
+        if ((dx <= 1 && dy <= 1) && (dx + dy != 0)) {
+            if (!verifyTarget(board, destinationCol, destinationRow)) return false;
 
-        if ((colChange + rowChange == 1) || (colChange * rowChange == 1)) {
-            return verifyTarget(board, destinationCol, destinationRow);
+            if (isNextToEnemyKing(destinationCol, destinationRow, board)) return false;
+
+            return true;
         }
 
         return false;
@@ -66,5 +69,16 @@ public class King extends Piece{
             if (canCastle(board, true)) moves.add(new int[]{col + 2, row});
             if (canCastle(board, false)) moves.add(new int[]{col - 2, row});
         }
+    }
+
+    public boolean isNextToEnemyKing(int col, int row, ChessPanel board) {
+        for (Piece p : board.getPieces()) {
+            if (p instanceof King && p.color != this.color) {
+                int dx = Math.abs(p.col - col);
+                int dy = Math.abs(p.row - row);
+                if (dx <= 1 && dy <= 1) return true;
+            }
+        }
+        return false;
     }
 }
